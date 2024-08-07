@@ -250,6 +250,8 @@ async function main() {
 
     await createPost(postManager, exampleContent2);
 
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     // Assuming post IDs are 1 and 2 for the created posts
     const postId1 = 1;
     const postId2 = 2;
@@ -313,7 +315,10 @@ async function main() {
 
     // Creating comments
     await createComment(commentManager, postId, commentContent1);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await createComment(commentManager, postId, commentContent2);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Assuming comment IDs are 1 and 2 for the created comments
     const commentId1 = 1;
@@ -323,8 +328,11 @@ async function main() {
     await getComment(commentManager, commentId1);
     await getComment(commentManager, commentId2);
 
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     // Updating a comment
     await updateComment(commentManager, commentId1, updatedCommentContent);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Retrieving updated comment
     await getComment(commentManager, commentId1);
@@ -333,7 +341,7 @@ async function main() {
     await deleteComment(commentManager, commentId2);
 
     // Attempt to retrieve deleted comment
-    await getComment(commentManager, commentId2);
+    // await getComment(commentManager, commentId2);
 
     //! 4 Follow system Ends
 
@@ -365,13 +373,18 @@ async function main() {
         const following = await followSystem.getFollowing(user);
         console.log(`Users followed by ${user}:`, following);
     }
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Following users
     await followUser(followSystem, userAddressAlice);
-    await followUser(followSystem, userAddressBob);
+    // await followUser(followSystem, userAddressBob);
 
     // Retrieving followers
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await getFollowers(followSystem, userAddressAlice);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await getFollowers(followSystem, userAddressBob);
 
     // Retrieving following lists
@@ -379,6 +392,7 @@ async function main() {
 
     // Unfollowing a user
     await unfollowUser(followSystem, userAddressAlice);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Retrieving updated following list
     await getFollowing(followSystem, deployer.address);
@@ -401,49 +415,61 @@ async function main() {
     // Retrieving messages sent by a user
     async function getSentMessages(messagingSystem: any, sender: any) {
         console.log(`Retrieving messages sent by ${sender}`);
-        const messages = await messagingSystem.getSentMessages(sender);
+        const messages = await messagingSystem.getUserMessages(sender);
         console.log(`Messages sent by ${sender}:`, messages);
     }
 
     // Retrieving messages received by a user
-    async function getReceivedMessages(messagingSystem: any, recipient: any) {
-        console.log(`Retrieving messages received by ${recipient}`);
-        const messages = await messagingSystem.getReceivedMessages(recipient);
-        console.log(`Messages received by ${recipient}:`, messages);
-    }
+    // async function getReceivedMessages(messagingSystem: any, recipient: any) {
+    //     console.log(`Retrieving messages received by ${recipient}`);
+    //     const messages = await messagingSystem.getReceivedMessages(recipient);
+    //     console.log(`Messages received by ${recipient}:`, messages);
+    // }
 
     // Deleting a message
-    async function deleteMessage(messagingSystem: any, messageId: any) {
-        console.log(`Deleting message ID: ${messageId}`);
-        await messagingSystem.deleteMessage(messageId);
+    // async function deleteMessage(messagingSystem: any, messageId: any) {
+    //     console.log(`Deleting message ID: ${messageId}`);
+    //     await messagingSystem.deleteMessage(messageId);
+    // }
+
+    //Get a message by id
+    async function getMessage(messagingSystem: any, messageId: any) {
+        console.log(`Retrieving message ID: ${messageId}`);
+        const message = await messagingSystem.getMessage(messageId);
+        console.log(`Message ID: ${messageId}`, message);
     }
 
     // Example addresses and message content
-    const recipientAddress = "0x..."; // Replace with actual recipient address
+    const recipientAddress = "0x89De2C53352850d8c1f18E7D3d1Ba999cEB2E1f5"; // Replace with actual recipient address
     const messageContent1 = "Hello, how are you?";
     const messageContent2 = "Don't forget the meeting tomorrow.";
     const senderAddress = deployer.address; // Assuming the sender is the deployer
 
     // Sending messages
     await sendMessage(messagingSystem, recipientAddress, messageContent1);
+
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await sendMessage(messagingSystem, recipientAddress, messageContent2);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Assuming message IDs are 1 and 2 for the sent messages
     const messageId1 = 1;
     const messageId2 = 2;
-
+    await getMessage(messagingSystem, messageId1);
     // Retrieving sent messages
     await getSentMessages(messagingSystem, senderAddress);
 
     // Retrieving received messages
-    await getReceivedMessages(messagingSystem, recipientAddress);
+    //await getReceivedMessages(messagingSystem, recipientAddress);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Deleting a message
-    await deleteMessage(messagingSystem, messageId1);
+    // await deleteMessage(messagingSystem, messageId1);
 
     // Attempt to retrieve deleted message (should not exist)
-    await getSentMessages(messagingSystem, senderAddress);
-    await getReceivedMessages(messagingSystem, recipientAddress);
+    //await getSentMessages(messagingSystem, senderAddress);
+    //await getReceivedMessages(messagingSystem, recipientAddress);
 
     //! 6 messaging system ends
 
@@ -480,8 +506,13 @@ async function main() {
 
     // Rewarding users for actions
     await rewardForPostCreation(rewardsSystem, userAddressAlice);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await rewardForCommentCreation(rewardsSystem, userAddressBob);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await rewardForFollowing(rewardsSystem, userAddressAlice);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Checking rewards balances
     await checkRewardsBalance(rewardsSystem, userAddressAlice);
@@ -544,13 +575,18 @@ async function main() {
 
     // Reporting posts and comments
     await reportPost(contentModeration, postId, reportReason);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await reportComment(contentModeration, commentId, reportReason);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     // Assuming report IDs are 1 for the created reports
     const reportId1 = 1;
 
     // Reviewing reports
     await reviewPostReport(contentModeration, reportId1, reviewDecision);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     await reviewCommentReport(contentModeration, reportId1, reviewDecision);
 
     //! 8 content moderation ends

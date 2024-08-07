@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@nomicfoundation/hardhat-verify";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -8,6 +9,21 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x";
 
 const config: HardhatUserConfig = {
     solidity: "0.8.18",
+    etherscan: {
+        apiKey: {
+            bartio_testnet: "bartio_testnet", // apiKey is not required, just set a placeholder
+        },
+        customChains: [
+            {
+                network: "bartio_testnet",
+                chainId: 80084,
+                urls: {
+                    apiURL: "https://api.routescan.io/v2/network/testnet/evm/80084/etherscan",
+                    browserURL: "https://bartio.beratrail.io",
+                },
+            },
+        ],
+    },
     networks: {
         // baseMainnet: {
         //     url: "https://mainnet.base.org",
@@ -67,10 +83,10 @@ const config: HardhatUserConfig = {
         //     accounts: [PRIVATE_KEY],
         //     chainId: 250,
         // },
-        beraTestnet: {
-            url: "https://rpc.bera.network",
+        bartio_testnet: {
+            url: "https://bartio.rpc.berachain.com/",
             accounts: [PRIVATE_KEY],
-            chainId: 977,
+            chainId: 80084,
         },
         baseSepolia: {
             url: "https://sepolia.base.org",
