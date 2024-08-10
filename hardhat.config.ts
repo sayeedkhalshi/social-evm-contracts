@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x";
+const ANVIL_KEY = process.env.ANVIL_KEY || "0x";
 
 const config: HardhatUserConfig = {
     solidity: "0.8.18",
@@ -25,43 +26,23 @@ const config: HardhatUserConfig = {
         ],
     },
     networks: {
-        // baseMainnet: {
-        //     url: "https://mainnet.base.org",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 8453,
-        // },
-        // polygonMainnet: {
-        //     url: process.env.POLYGON_RPC_URL,
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 137,
-        // },
-        // metisMainnet: {
-        //     url: "https://lb.nodies.app/v1/d4b4abc42ddb4372a23cfc6edc08b592",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 1088,
-        // },
+        anvilLocalhost: {
+            url: "http://127.0.0.1:8545",
+            accounts: [ANVIL_KEY],
+            chainId: 31337,
+        },
         ethSepolia: {
             url: "https://eth-sepolia.g.alchemy.com/v2/dFxiveV70jruw7zuJ5ybDJcj1uZOiROy",
             accounts: [PRIVATE_KEY],
             chainId: 11155111,
         },
 
-        metisSepolia: {
-            url: "https://sepolia.metisdevops.link",
-            accounts: [PRIVATE_KEY],
-            chainId: 59902,
-        },
         tabiTestnet: {
             url: "https://rpc.testnet.tabichain.com",
             accounts: [PRIVATE_KEY],
             chainId: 9789,
         },
-        vanarTestnet: {
-            //vanguard
-            url: "https://rpc-vanguard.vanarchain.com",
-            accounts: [PRIVATE_KEY],
-            chainId: 78600,
-        },
+
         tenTestnet: {
             url: "https://testnet.ten.xyz/v1/?token=66a94ca7ff8715ae7ecb0cd7a2a9065de1330c02",
             accounts: [PRIVATE_KEY],
@@ -73,16 +54,11 @@ const config: HardhatUserConfig = {
             chainId: 167009,
         }, //done
 
-        // zksyncSepolia: {
-        //     url: "https://zksync2-testnet.zksync.io",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 31337,
-        // },
-        // lineaSepolia: {
-        //     url: "https://rpc.linea.io",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 250,
-        // },
+        lineaSepolia: {
+            url: "https://rpc.linea.io",
+            accounts: [PRIVATE_KEY],
+            chainId: 250,
+        },
         bartio_testnet: {
             url: "https://bartio.rpc.berachain.com/",
             accounts: [PRIVATE_KEY],
@@ -93,57 +69,79 @@ const config: HardhatUserConfig = {
             accounts: [PRIVATE_KEY],
             chainId: 84532,
         },
-        // polygonZKEVM: {
-        //     url: "https://rpc-mainnet.maticvigil.com",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 80001,
-        // },
-        // opBNBTestnet: {
-        //     url: "https://rpc-testnet.openbank.network",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 97,
-        // },
-        // zetaTestnet: {
-        //     url: "https://rpc-testnet.zeta.xyz",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 10000,
-        // },
-        // scrollSepolia: {},
-        // zoraSepolia: {
-        //     url: "https://zora-mainnet-v1-rpc.zoraswap.com",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 1285,
-        // },
+
         // quaiTestnet: {
         //     url: "https://rpc.testnet.quai.xyz",
         //     accounts: [PRIVATE_KEY],
         //     chainId: 10001,
         // },
-        // blastTestnet: {
-        //     url: "https://rpc.testnet.blast.xyz",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 10002,
-        // },
-        // lightLinkTestnet: {
-        //     url: "https://rpc.testnet.light.eth.linkpool.io",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 10003,
-        // },
-        // shardeumTestnet: {
-        //     url: "https://rpc.testnet.shardeum.network",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 10004,
-        // },
-        // modeTestnet: {
-        //     url: "https://rpc.testnet.mode.network",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 10005,
-        // },
-        // zkLinkTestnet: {
-        //     url: "https://rpc.testnet.zklink.io",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 10006,
-        // },
+
+        shardeumTestnet: {
+            url: "https://rpc.testnet.shardeum.network",
+            accounts: [PRIVATE_KEY],
+            chainId: 10004,
+        },
+
+        haven1Testnet: {
+            url: "https://testnet-rpc.haven1.org",
+            accounts: [PRIVATE_KEY],
+            chainId: 810,
+        },
+
+        etherLinkTestnet: {
+            url: "https://node.ghostnet.etherlink.com",
+            accounts: [PRIVATE_KEY],
+            chainId: 128123,
+        },
+        zkscamTestnet: {
+            url: "https://zkscam.io/rpc/",
+            accounts: [PRIVATE_KEY],
+            chainId: 63658,
+        },
+        fluentTestnet: {
+            url: "https://rpc.dev.thefluent.xyz/",
+            accounts: [PRIVATE_KEY],
+            chainId: 20993,
+        },
+
+        quaiTestnet: {
+            url: "https://rpc.paxos1.colosseum.quaiscan.io",
+            accounts: [PRIVATE_KEY],
+            chainId: 9000,
+        },
+        zircuittestnet: {
+            url: "https://zircuit1.p2pify.com/",
+            accounts: [PRIVATE_KEY],
+            chainId: 48899,
+        },
+
+        zamaTestnet: {
+            url: "https://devnet.zama.ai",
+            accounts: [PRIVATE_KEY],
+            chainId: 8009,
+        },
+
+        fhenixTestnet: {
+            url: "https://api.helium.fhenix.zone",
+            accounts: [PRIVATE_KEY],
+            chainId: 8008135,
+        },
+        atletaTestnet: {
+            url: "https://testnet-rpc.atleta.network:9944/",
+            accounts: [PRIVATE_KEY],
+            chainId: 2340,
+        },
+        arletaTestnet: {
+            url: "https://betanet-rpc1.artela.network",
+            accounts: [PRIVATE_KEY],
+            chainId: 11822,
+        },
+        citreaTestnet: {
+            url: "https://rpc.devnet.citrea.xyz",
+            accounts: [PRIVATE_KEY],
+            chainId: 62298,
+        },
+
         // astarTestnet: {
         //     url: "https://rpc.testnet.astar.network",
         //     accounts: [PRIVATE_KEY],
@@ -184,11 +182,7 @@ const config: HardhatUserConfig = {
         //     accounts: [PRIVATE_KEY],
         //     chainId: 10014,
         // },
-        // orderlyTestnet: {
-        //     url: "https://rpc.testnet.orderly.xyz",
-        //     accounts: [PRIVATE_KEY],
-        //     chainId: 10015,
-        // },
+
         // zkmTestnet: {
         //     url: "https://rpc.testnet.zkm.finance",
         //     accounts: [PRIVATE_KEY],

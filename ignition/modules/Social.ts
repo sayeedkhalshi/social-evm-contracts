@@ -1,83 +1,139 @@
-// scripts/deploy.js
 import { ethers, run } from "hardhat";
+import { waitForRandomTime } from "./waiter";
+import { exec } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import { NEW_DEPLOY, TEST_LOCAL, VERIFY_CONTRACTS } from "../../settings";
+
+function updateContractAddress(
+    contractName: string,
+    contractAddress: any,
+    contractsFile: string
+) {
+    const regex = new RegExp(
+        `export const ${contractName} = "0x[a-fA-F0-9]{40}";`
+    );
+    const newEntry = `export const ${contractName} = "${contractAddress}";`;
+
+    if (regex.test(contractsFile)) {
+        return contractsFile.replace(regex, newEntry);
+    } else {
+        return contractsFile + `\n${newEntry}`;
+    }
+}
 
 async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log("Deploying contracts with the account:", deployer.address);
 
-    const nonce = await deployer.getNonce();
     const balance = await deployer.provider.getBalance(deployer.address);
-
     console.log("Account balance:", balance.toString());
 
-    // Deploy UserManager
-    const UserManager = await ethers.getContractFactory("UserManager");
-    const userManager = await UserManager.deploy();
+    const chainId = (await deployer.provider.getNetwork()).chainId;
 
-    console.log("UserManager deployed to:", userManager.target);
+    const directoryPath = path.join(
+        __dirname,
+        `../../chain-settings/${chainId}`
+    );
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    const contractsFilePath = path.join(directoryPath, "contracts.ts");
+    const contractsFile = fs.existsSync(contractsFilePath)
+        ? fs.readFileSync(contractsFilePath, "utf8")
+        : "";
 
-    // Deploy SocialToken
-    const SocialToken = await ethers.getContractFactory("SocialToken");
-    const socialToken = await SocialToken.deploy();
+    let updatedContractsFile = contractsFile;
 
-    console.log("SocialToken deployed to:", socialToken.target);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    const deployOrFetch = async (contractName: string, deployArgs: any[]) => {
+        let contractInstance;
 
-    // Deploy PostManager
-    const PostManager = await ethers.getContractFactory("PostManager");
-    const postManager = await PostManager.deploy(userManager.target);
+        if (NEW_DEPLOY) {
+            const contractFactory = await ethers.getContractFactory(
+                contractName
+            );
+            contractInstance = await contractFactory.deploy(...deployArgs);
+            console.log(
+                `${contractName} deployed to:`,
+                contractInstance.target
+            );
+            const contractAddress = contractInstance.target;
+            updatedContractsFile = updateContractAddress(
+                contractName,
+                contractAddress,
+                updatedContractsFile
+            );
+            await waitForRandomTime();
+        } else {
+            const regex = new RegExp(
+                `export const ${contractName} = "(0x[a-fA-F0-9]{40})";`
+            );
+            const match = contractsFile.match(regex);
+            if (match) {
+                const contractAddress = match[1];
+                console.log(
+                    `${contractName} fetched from contracts file:`,
+                    contractAddress
+                );
+                const contractFactory = await ethers.getContractFactory(
+                    contractName
+                );
+                contractInstance = contractFactory.attach(contractAddress); // Attach to the already deployed contract
+            } else {
+                throw new Error(
+                    `Contract ${contractName} not found in contracts file.`
+                );
+            }
+        }
+        return contractInstance;
+    };
 
-    console.log("PostManager deployed to:", postManager.target);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // Deploy CommentManager
-    const CommentManager = await ethers.getContractFactory("CommentManager");
-    const commentManager = await CommentManager.deploy(
+    const userManager = await deployOrFetch("UserManager", []);
+    const socialToken = await deployOrFetch("SocialToken", []);
+    const postManager = await deployOrFetch("PostManager", [
         userManager.target,
-        postManager.target
-    );
-
-    console.log("CommentManager deployed to:", commentManager.target);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // Deploy FollowSystem
-    const FollowSystem = await ethers.getContractFactory("FollowSystem");
-    const followSystem = await FollowSystem.deploy(userManager.target);
-
-    console.log("FollowSystem deployed to:", followSystem.target);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // Deploy MessagingSystem
-    const MessagingSystem = await ethers.getContractFactory("MessagingSystem");
-    const messagingSystem = await MessagingSystem.deploy(userManager.target);
-
-    console.log("MessagingSystem deployed to:", messagingSystem.target);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // Deploy RewardsSystem
-    const RewardsSystem = await ethers.getContractFactory("RewardsSystem");
-    const rewardsSystem = await RewardsSystem.deploy(
-        socialToken.target,
-        userManager.target
-    );
-    console.log("RewardsSystem deployed to:", rewardsSystem.target);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // Deploy ContentModeration
-    const ContentModeration = await ethers.getContractFactory(
-        "ContentModeration"
-    );
-    const contentModeration = await ContentModeration.deploy(
+    ]);
+    const commentManager = await deployOrFetch("CommentManager", [
         userManager.target,
         postManager.target,
-        commentManager.target
-    );
+    ]);
+    const followSystem = await deployOrFetch("FollowSystem", [
+        userManager.target,
+    ]);
+    const messagingSystem = await deployOrFetch("MessagingSystem", [
+        userManager.target,
+    ]);
+    const rewardsSystem = await deployOrFetch("RewardsSystem", [
+        socialToken.target,
+        userManager.target,
+    ]);
+    const contentModeration = await deployOrFetch("ContentModeration", [
+        userManager.target,
+        postManager.target,
+        commentManager.target,
+    ]);
+    const groupManager = await deployOrFetch("GroupManager", [
+        deployer.address,
+    ]);
 
-    console.log("ContentModeration deployed to:", contentModeration.target);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    // Write updated contracts to contracts.ts
+    if (NEW_DEPLOY) {
+        fs.writeFileSync(contractsFilePath, updatedContractsFile, "utf8");
+    }
+
+    const contractAddressArray = [
+        userManager.target,
+        socialToken.target,
+        postManager.target,
+        commentManager.target,
+        followSystem.target,
+        messagingSystem.target,
+        rewardsSystem.target,
+        contentModeration.target,
+        groupManager.target,
+    ];
 
     //**Interaction Starts */ */
     //! 1 Follow system starts
@@ -93,7 +149,7 @@ async function main() {
         console.log(`Adding user: ${name}`);
         await userManager.registerUser(name, bio, profilePic);
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Updating user profile
     async function updateUserProfile(
@@ -106,7 +162,7 @@ async function main() {
         await userManager.updateUserProfile(name, bio, profilePic);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Retrieving user profile
     async function getUserProfile(userManager: any, userAddress: any) {
@@ -114,24 +170,32 @@ async function main() {
         const profile = await userManager.getUserProfile(userAddress);
         console.log(`Profile for ${userAddress}:`, profile);
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
+
+    async function getUserByUsername(userManager: any, username: any) {
+        console.log(`Retrieving user profile for username: ${username}`);
+        const profile = await userManager.getUserByUsername(username);
+        console.log(`Profile for ${username}:`, profile);
+    }
 
     // Example user addresses
     const userAddressAlice = "0x89De2C53352850d8c1f18E7D3d1Ba999cEB2E1f5"; // pre created Replace with actual address of Alice
-    const userAddressBob = "0x713b8F6E2e42C0481E8B2A4095A4f878BF932716"; // Replace with actual address of Bob
+    const userAddressBob = TEST_LOCAL
+        ? "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        : "0x713b8F6E2e42C0481E8B2A4095A4f878BF932716"; // Replace with actual address of Bob
 
     // Adding users
     await addUser(userManager, "Bob", "I am a coder", "Pic 1");
     //await addUser(userManager, "Bob", "I am a coder", "Pic 2");
-    await new Promise((resolve) => setTimeout(resolve, 4000));
+    await waitForRandomTime();
 
     // Updating user profiles
     await updateUserProfile(userManager, "Bob", "I am a dev", "Profile pic 2");
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Retrieving user profiles
     await getUserProfile(userManager, userAddressAlice);
-    const alice = await userManager.getUserByUsername("Alice");
+    const alice = await getUserByUsername(userManager, "Alice");
     console.log("Alice profile", alice);
 
     //! 1 Follow system Ends
@@ -148,7 +212,7 @@ async function main() {
         );
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Transferring tokens from one address to another
     async function transferTokens(
@@ -163,7 +227,7 @@ async function main() {
             .transfer(to, ethers.parseUnits(amount.toString(), 18));
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Checking token balance of an address
     async function checkBalance(socialToken: any, address: any) {
@@ -171,18 +235,18 @@ async function main() {
         console.log(`Balance of ${address}:`, ethers.formatUnits(balance, 18));
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Minting tokens
     await mintTokens(socialToken, deployer.address, 1000); // Mint 1000 tokens to deployer
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await mintTokens(socialToken, userAddressAlice, 500); // Mint 500 tokens to Alice
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await mintTokens(socialToken, userAddressBob, 300); // Mint 300 tokens to Bob
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Checking balances after minting
     await checkBalance(socialToken, deployer.address);
@@ -191,7 +255,7 @@ async function main() {
 
     // Transferring tokens
     await transferTokens(socialToken, deployer, userAddressAlice, 100); // Transfer 100 tokens from deployer to Alice
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     //await transferTokens(socialToken, userAddressAlice, userAddressBob, 50); // Transfer 50 tokens from Alice to Bob
 
@@ -204,14 +268,14 @@ async function main() {
 
     //! 3 Follow system starts
     // Interactions with PostManager Contract
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Creating a post
     async function createPost(postManager: any, content: any) {
         console.log(`Creating post: ${content}`);
         await postManager.createPost(content);
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Updating a post
     async function updatePost(postManager: any, postId: any, newContent: any) {
@@ -220,7 +284,7 @@ async function main() {
         );
         await postManager.updatePost(postId, newContent);
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Retrieving a post
     async function getPost(postManager: any, postId: any) {
@@ -228,7 +292,7 @@ async function main() {
         const post = await postManager.getPost(postId);
         console.log(`Post ID ${postId}:`, post);
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Deleting a post
     async function deletePost(postManager: any, postId: any) {
@@ -236,21 +300,21 @@ async function main() {
         await postManager.deletePost(postId);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Example interactions
     const exampleContent1 = "Hello, World!";
     const exampleContent2 = "This is another post.";
     const updatedContent = "Updated post content.";
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Creating posts
     await createPost(postManager, exampleContent1);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await createPost(postManager, exampleContent2);
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Assuming post IDs are 1 and 2 for the created posts
     const postId1 = 1;
@@ -259,7 +323,7 @@ async function main() {
     // Retrieving posts
     await getPost(postManager, postId1);
     await getPost(postManager, postId2);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Updating a post
     await updatePost(postManager, postId1, updatedContent);
@@ -315,10 +379,10 @@ async function main() {
 
     // Creating comments
     await createComment(commentManager, postId, commentContent1);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await createComment(commentManager, postId, commentContent2);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Assuming comment IDs are 1 and 2 for the created comments
     const commentId1 = 1;
@@ -328,11 +392,11 @@ async function main() {
     await getComment(commentManager, commentId1);
     await getComment(commentManager, commentId2);
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Updating a comment
     await updateComment(commentManager, commentId1, updatedCommentContent);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Retrieving updated comment
     await getComment(commentManager, commentId1);
@@ -373,17 +437,17 @@ async function main() {
         const following = await followSystem.getFollowing(user);
         console.log(`Users followed by ${user}:`, following);
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Following users
     await followUser(followSystem, userAddressAlice);
     // await followUser(followSystem, userAddressBob);
 
     // Retrieving followers
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await getFollowers(followSystem, userAddressAlice);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await getFollowers(followSystem, userAddressBob);
 
@@ -392,7 +456,7 @@ async function main() {
 
     // Unfollowing a user
     await unfollowUser(followSystem, userAddressAlice);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Retrieving updated following list
     await getFollowing(followSystem, deployer.address);
@@ -448,10 +512,10 @@ async function main() {
     // Sending messages
     await sendMessage(messagingSystem, recipientAddress, messageContent1);
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await sendMessage(messagingSystem, recipientAddress, messageContent2);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Assuming message IDs are 1 and 2 for the sent messages
     const messageId1 = 1;
@@ -462,7 +526,7 @@ async function main() {
 
     // Retrieving received messages
     //await getReceivedMessages(messagingSystem, recipientAddress);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Deleting a message
     // await deleteMessage(messagingSystem, messageId1);
@@ -475,6 +539,19 @@ async function main() {
 
     //! 7 reward system starts
     // Interactions with RewardsSystem Contract
+
+    // Approve the RewardsSystem contract to distribute tokens on behalf of the owner
+    async function approveRewardsSystem(
+        socialToken: any,
+        rewardsSystemAddress: any,
+        owner: any
+    ) {
+        console.log(
+            `Approving RewardsSystem at ${rewardsSystemAddress} to manage rewards on behalf of the owner.`
+        );
+        await socialToken.connect(owner).approveContract(rewardsSystemAddress);
+        console.log("RewardsSystem approved.");
+    }
 
     // Rewarding a user for post creation
     async function rewardForPostCreation(rewardsSystem: any, user: any) {
@@ -491,13 +568,13 @@ async function main() {
     // Rewarding a user for following another user
     async function rewardForFollowing(rewardsSystem: any, user: any) {
         console.log(`Rewarding user ${user} for following another user`);
-        await rewardsSystem.rewardForFollowing(user);
+        await rewardsSystem.rewardForFollowingUser(user);
     }
 
     // Checking rewards balance of a user
-    async function checkRewardsBalance(rewardsSystem: any, user: any) {
+    async function checkRewardsBalance(socialToken: any, user: any) {
         console.log(`Checking rewards balance for user: ${user}`);
-        const balance = await rewardsSystem.rewardsBalance(user);
+        const balance = await socialToken.balanceOf(user);
         console.log(
             `Rewards balance of ${user}:`,
             ethers.formatUnits(balance, 18)
@@ -505,18 +582,22 @@ async function main() {
     }
 
     // Rewarding users for actions
+    // Approve the RewardsSystem contract to distribute tokens on behalf of the owner
+    await approveRewardsSystem(socialToken, rewardsSystem.target, deployer);
+
+    // Rewarding users for actions
     await rewardForPostCreation(rewardsSystem, userAddressAlice);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await rewardForCommentCreation(rewardsSystem, userAddressBob);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await rewardForFollowing(rewardsSystem, userAddressAlice);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Checking rewards balances
-    await checkRewardsBalance(rewardsSystem, userAddressAlice);
-    await checkRewardsBalance(rewardsSystem, userAddressBob);
+    await checkRewardsBalance(socialToken, userAddressAlice);
+    await checkRewardsBalance(socialToken, userAddressBob);
 
     //! 7 reward system ends
 
@@ -575,21 +656,96 @@ async function main() {
 
     // Reporting posts and comments
     await reportPost(contentModeration, postId, reportReason);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     await reportComment(contentModeration, commentId, reportReason);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
     // Assuming report IDs are 1 for the created reports
     const reportId1 = 1;
 
     // Reviewing reports
     await reviewPostReport(contentModeration, reportId1, reviewDecision);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await waitForRandomTime();
 
-    await reviewCommentReport(contentModeration, reportId1, reviewDecision);
+    //await reviewCommentReport(contentModeration, reportId1, reviewDecision);
 
     //! 8 content moderation ends
+
+    //! 9 Group system starts
+
+    // Creating a new group
+    async function createGroup(groupManager: any, groupName: string) {
+        console.log(`Creating group: ${groupName}`);
+        await groupManager.createGroup(groupName);
+    }
+
+    // Joining a group
+    async function joinGroup(groupManager: any, groupId: number) {
+        console.log(`Joining group ID: ${groupId}`);
+        await groupManager.joinGroup(groupId);
+    }
+
+    // Leaving a group
+    async function leaveGroup(groupManager: any, groupId: number) {
+        console.log(`Leaving group ID: ${groupId}`);
+        await groupManager.leaveGroup(groupId);
+    }
+
+    // Getting group details
+    async function getGroup(groupManager: any, groupId: number) {
+        console.log(`Getting details for group ID: ${groupId}`);
+        const group = await groupManager.getGroup(groupId);
+        console.log(
+            `Group ID: ${group[0]}, Name: ${group[1]}, Members: ${group[2]}, Owner: ${group[3]}`
+        );
+    }
+
+    // Getting user's groups
+    async function getUserGroups(groupManager: any, user: any) {
+        console.log(`Getting groups for user: ${user}`);
+        const groups = await groupManager.getUserGroups(user);
+        console.log(`Groups: ${groups}`);
+    }
+    // Creating groups
+    await createGroup(groupManager, "Developers Group");
+    await createGroup(groupManager, "Designers Group");
+
+    // User1 joining the "Developers Group"
+    await joinGroup(groupManager, 1);
+
+    // User2 joining the "Designers Group"
+    await joinGroup(groupManager, 2);
+
+    // User1 leaving the "Developers Group"
+    await leaveGroup(groupManager, 1);
+
+    // Getting group details
+    await getGroup(groupManager, 1);
+    await getGroup(groupManager, 2);
+
+    // Getting user groups
+    await getUserGroups(groupManager, deployer);
+
+    //! 9 Group system ends
+    console.log("All interactions completed successfully.");
+
+    if (VERIFY_CONTRACTS) {
+        // Verify the contract on Etherscan
+        for (const contractAddress of contractAddressArray) {
+            exec(
+                `npx hardhat verify --network bartio_testnet ${contractAddress}`,
+                (error: any, stdout: any, stderr: any) => {
+                    if (error) {
+                        console.error(`exec error: ${error}`);
+                        return;
+                    }
+                    console.log(`stdout: ${stdout}`);
+                    console.error(`stderr: ${stderr}`);
+                }
+            );
+        }
+    }
 }
 
 main()
