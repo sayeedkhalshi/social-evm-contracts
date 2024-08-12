@@ -1,9 +1,13 @@
-import { ethers, run } from "hardhat";
-import { waitForRandomTime } from "./waiter";
+import { ethers } from "hardhat";
+import { getRandomWeightedNumber, waitForRandomTime } from "./waiter";
 import { exec } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import { NEW_DEPLOY, TEST_LOCAL, VERIFY_CONTRACTS } from "../../settings";
+import { getRandomUsername } from "../../contracts-settings/getRandomName";
+import { getRandomText } from "../../contracts-settings/getRandomText";
+import { getRandomReportReason } from "../../contracts-settings/getRandomReportReason";
+import { getRandomGroupname } from "../../contracts-settings/getRandomGroupName";
 
 function updateContractAddress(
     contractName: string,
@@ -31,6 +35,34 @@ async function main() {
     console.log("Account balance:", balance.toString());
 
     const chainId = (await deployer.provider.getNetwork()).chainId;
+    console.log("Chain ID:", chainId);
+
+    //get random data
+    const name1 = getRandomUsername();
+    const name2 = getRandomUsername();
+    const name3 = getRandomUsername();
+    const bio1 = getRandomText();
+    const bio2 = getRandomText();
+    const bio3 = getRandomText();
+    const text1 = getRandomText();
+    const text2 = getRandomText();
+    const text3 = getRandomText();
+    const profilePic1 = getRandomText();
+    const profilePic2 = getRandomText();
+    const profilePic3 = getRandomText();
+    const amount1 = getRandomWeightedNumber();
+    const amount2 = getRandomWeightedNumber();
+    const amount3 = getRandomWeightedNumber();
+    const comment1 = getRandomText();
+    const comment2 = getRandomText();
+    const comment3 = getRandomText();
+    const message1 = getRandomText();
+    const message2 = getRandomText();
+    const message3 = getRandomText();
+    const reportReason1 = getRandomReportReason();
+    const reportReason2 = getRandomReportReason();
+    const groupJanena = getRandomGroupname();
+    const groupJanena2 = getRandomGroupname();
 
     const directoryPath = path.join(
         __dirname,
@@ -149,7 +181,6 @@ async function main() {
         console.log(`Adding user: ${name}`);
         await userManager.registerUser(name, bio, profilePic);
     }
-    await waitForRandomTime();
 
     // Updating user profile
     async function updateUserProfile(
@@ -162,15 +193,12 @@ async function main() {
         await userManager.updateUserProfile(name, bio, profilePic);
     }
 
-    await waitForRandomTime();
-
     // Retrieving user profile
     async function getUserProfile(userManager: any, userAddress: any) {
         console.log(`Retrieving user profile for address: ${userAddress}`);
         const profile = await userManager.getUserProfile(userAddress);
         console.log(`Profile for ${userAddress}:`, profile);
     }
-    await waitForRandomTime();
 
     async function getUserByUsername(userManager: any, username: any) {
         console.log(`Retrieving user profile for username: ${username}`);
@@ -185,17 +213,19 @@ async function main() {
         : "0x713b8F6E2e42C0481E8B2A4095A4f878BF932716"; // Replace with actual address of Bob
 
     // Adding users
-    await addUser(userManager, "Bob", "I am a coder", "Pic 1");
-    //await addUser(userManager, "Bob", "I am a coder", "Pic 2");
+    await addUser(userManager, name1, bio1, profilePic1);
+    await waitForRandomTime();
+
+    //await addUser(userManager, "Jaimi", "I write", "Pic link");
     await waitForRandomTime();
 
     // Updating user profiles
-    await updateUserProfile(userManager, "Bob", "I am a dev", "Profile pic 2");
+    await updateUserProfile(userManager, name1, bio2, profilePic2);
     await waitForRandomTime();
 
     // Retrieving user profiles
     await getUserProfile(userManager, userAddressAlice);
-    const alice = await getUserByUsername(userManager, "Alice");
+    const alice = await getUserByUsername(userManager, name1);
     console.log("Alice profile", alice);
 
     //! 1 Follow system Ends
@@ -212,8 +242,6 @@ async function main() {
         );
     }
 
-    await waitForRandomTime();
-
     // Transferring tokens from one address to another
     async function transferTokens(
         socialToken: any,
@@ -227,24 +255,20 @@ async function main() {
             .transfer(to, ethers.parseUnits(amount.toString(), 18));
     }
 
-    await waitForRandomTime();
-
     // Checking token balance of an address
     async function checkBalance(socialToken: any, address: any) {
         const balance = await socialToken.balanceOf(address);
         console.log(`Balance of ${address}:`, ethers.formatUnits(balance, 18));
     }
 
-    await waitForRandomTime();
-
     // Minting tokens
-    await mintTokens(socialToken, deployer.address, 1000); // Mint 1000 tokens to deployer
+    await mintTokens(socialToken, deployer.address, amount1); // Mint 1000 tokens to deployer
     await waitForRandomTime();
 
-    await mintTokens(socialToken, userAddressAlice, 500); // Mint 500 tokens to Alice
+    await mintTokens(socialToken, userAddressAlice, amount2); // Mint 500 tokens to Alice
     await waitForRandomTime();
 
-    await mintTokens(socialToken, userAddressBob, 300); // Mint 300 tokens to Bob
+    await mintTokens(socialToken, userAddressBob, amount3); // Mint 300 tokens to Bob
 
     await waitForRandomTime();
 
@@ -254,8 +278,12 @@ async function main() {
     await checkBalance(socialToken, userAddressBob);
 
     // Transferring tokens
-    await transferTokens(socialToken, deployer, userAddressAlice, 100); // Transfer 100 tokens from deployer to Alice
-    await waitForRandomTime();
+    await transferTokens(
+        socialToken,
+        deployer,
+        userAddressAlice,
+        amount2 - 100
+    ); // Transfer 100 tokens from deployer to Alice
 
     //await transferTokens(socialToken, userAddressAlice, userAddressBob, 50); // Transfer 50 tokens from Alice to Bob
 
@@ -275,7 +303,6 @@ async function main() {
         console.log(`Creating post: ${content}`);
         await postManager.createPost(content);
     }
-    await waitForRandomTime();
 
     // Updating a post
     async function updatePost(postManager: any, postId: any, newContent: any) {
@@ -284,7 +311,6 @@ async function main() {
         );
         await postManager.updatePost(postId, newContent);
     }
-    await waitForRandomTime();
 
     // Retrieving a post
     async function getPost(postManager: any, postId: any) {
@@ -292,7 +318,6 @@ async function main() {
         const post = await postManager.getPost(postId);
         console.log(`Post ID ${postId}:`, post);
     }
-    await waitForRandomTime();
 
     // Deleting a post
     async function deletePost(postManager: any, postId: any) {
@@ -300,19 +325,11 @@ async function main() {
         await postManager.deletePost(postId);
     }
 
-    await waitForRandomTime();
-
-    // Example interactions
-    const exampleContent1 = "Hello, World!";
-    const exampleContent2 = "This is another post.";
-    const updatedContent = "Updated post content.";
-    await waitForRandomTime();
-
     // Creating posts
-    await createPost(postManager, exampleContent1);
+    await createPost(postManager, text1);
     await waitForRandomTime();
 
-    await createPost(postManager, exampleContent2);
+    await createPost(postManager, text2);
 
     await waitForRandomTime();
 
@@ -326,10 +343,10 @@ async function main() {
     await waitForRandomTime();
 
     // Updating a post
-    await updatePost(postManager, postId1, updatedContent);
+    await updatePost(postManager, postId1, text3);
 
     // Retrieving updated post
-    await getPost;
+    await getPost(postManager, postId1);
 
     //! 3 Follow system Ends
 
@@ -373,15 +390,12 @@ async function main() {
 
     // Example interactions
     const postId = 1; // Replace with an actual post ID
-    const commentContent1 = "Great post!";
-    const commentContent2 = "Thanks for sharing!";
-    const updatedCommentContent = "Updated comment content.";
 
     // Creating comments
-    await createComment(commentManager, postId, commentContent1);
+    await createComment(commentManager, postId, comment1);
     await waitForRandomTime();
 
-    await createComment(commentManager, postId, commentContent2);
+    await createComment(commentManager, postId, comment2);
     await waitForRandomTime();
 
     // Assuming comment IDs are 1 and 2 for the created comments
@@ -390,19 +404,18 @@ async function main() {
 
     // Retrieving comments
     await getComment(commentManager, commentId1);
-    await getComment(commentManager, commentId2);
-
-    await waitForRandomTime();
+    //await getComment(commentManager, commentId2);
 
     // Updating a comment
-    await updateComment(commentManager, commentId1, updatedCommentContent);
+    await updateComment(commentManager, commentId1, comment3);
     await waitForRandomTime();
 
     // Retrieving updated comment
     await getComment(commentManager, commentId1);
 
     // Deleting a comment
-    await deleteComment(commentManager, commentId2);
+    // await deleteComment(commentManager, commentId2);
+    //await waitForRandomTime();
 
     // Attempt to retrieve deleted comment
     // await getComment(commentManager, commentId2);
@@ -437,17 +450,14 @@ async function main() {
         const following = await followSystem.getFollowing(user);
         console.log(`Users followed by ${user}:`, following);
     }
-    await waitForRandomTime();
 
     // Following users
     await followUser(followSystem, userAddressAlice);
     // await followUser(followSystem, userAddressBob);
 
     // Retrieving followers
-    await waitForRandomTime();
 
     await getFollowers(followSystem, userAddressAlice);
-    await waitForRandomTime();
 
     await getFollowers(followSystem, userAddressBob);
 
@@ -455,8 +465,8 @@ async function main() {
     await getFollowing(followSystem, deployer.address);
 
     // Unfollowing a user
-    await unfollowUser(followSystem, userAddressAlice);
     await waitForRandomTime();
+    await unfollowUser(followSystem, userAddressAlice);
 
     // Retrieving updated following list
     await getFollowing(followSystem, deployer.address);
@@ -505,8 +515,8 @@ async function main() {
 
     // Example addresses and message content
     const recipientAddress = "0x89De2C53352850d8c1f18E7D3d1Ba999cEB2E1f5"; // Replace with actual recipient address
-    const messageContent1 = "Hello, how are you?";
-    const messageContent2 = "Don't forget the meeting tomorrow.";
+    const messageContent1 = message1;
+    const messageContent2 = message2;
     const senderAddress = deployer.address; // Assuming the sender is the deployer
 
     // Sending messages
@@ -515,7 +525,6 @@ async function main() {
     await waitForRandomTime();
 
     await sendMessage(messagingSystem, recipientAddress, messageContent2);
-    await waitForRandomTime();
 
     // Assuming message IDs are 1 and 2 for the sent messages
     const messageId1 = 1;
@@ -526,7 +535,6 @@ async function main() {
 
     // Retrieving received messages
     //await getReceivedMessages(messagingSystem, recipientAddress);
-    await waitForRandomTime();
 
     // Deleting a message
     // await deleteMessage(messagingSystem, messageId1);
@@ -580,10 +588,11 @@ async function main() {
             ethers.formatUnits(balance, 18)
         );
     }
-
+    await waitForRandomTime();
     // Rewarding users for actions
     // Approve the RewardsSystem contract to distribute tokens on behalf of the owner
     await approveRewardsSystem(socialToken, rewardsSystem.target, deployer);
+    await waitForRandomTime();
 
     // Rewarding users for actions
     await rewardForPostCreation(rewardsSystem, userAddressAlice);
@@ -651,7 +660,7 @@ async function main() {
     // Example IDs and reasons
     //const postId = 1; // Replace with an actual post ID
     const commentId = 1; // Replace with an actual comment ID
-    const reportReason = "Inappropriate content";
+    const reportReason = reportReason1;
     const reviewDecision = true; // true for approve, false for reject
 
     // Reporting posts and comments
@@ -666,7 +675,6 @@ async function main() {
 
     // Reviewing reports
     await reviewPostReport(contentModeration, reportId1, reviewDecision);
-    await waitForRandomTime();
 
     //await reviewCommentReport(contentModeration, reportId1, reviewDecision);
 
@@ -708,17 +716,25 @@ async function main() {
         console.log(`Groups: ${groups}`);
     }
     // Creating groups
-    await createGroup(groupManager, "Developers Group");
-    await createGroup(groupManager, "Designers Group");
+    await waitForRandomTime();
+
+    await createGroup(groupManager, groupJanena);
+    await waitForRandomTime();
+
+    await createGroup(groupManager, groupJanena2);
+    await waitForRandomTime();
 
     // User1 joining the "Developers Group"
     await joinGroup(groupManager, 1);
+    await waitForRandomTime();
 
     // User2 joining the "Designers Group"
     await joinGroup(groupManager, 2);
+    await waitForRandomTime();
 
     // User1 leaving the "Developers Group"
     await leaveGroup(groupManager, 1);
+    await waitForRandomTime();
 
     // Getting group details
     await getGroup(groupManager, 1);
