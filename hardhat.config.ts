@@ -44,7 +44,7 @@ const config: HardhatUserConfig = {
         },
 
         tenTestnet: {
-            url: "https://testnet.ten.xyz/v1/?token=66a94ca7ff8715ae7ecb0cd7a2a9065de1330c02",
+            url: "https://testnet.ten.xyz/v1/?token=474DCD7D16298E42C788F6F2CE0BD633888538EF",
             accounts: [PRIVATE_KEY],
             chainId: 443,
         },
@@ -88,7 +88,7 @@ const config: HardhatUserConfig = {
             chainId: 810,
         },
 
-        etherLinkTestnet: {
+        etherlinkTestnet: {
             url: "https://node.ghostnet.etherlink.com",
             accounts: [PRIVATE_KEY],
             chainId: 128123,
@@ -131,7 +131,7 @@ const config: HardhatUserConfig = {
             accounts: [PRIVATE_KEY],
             chainId: 2340,
         },
-        arletaTestnet: {
+        artelaTestnet: {
             url: "https://betanet-rpc1.artela.network",
             accounts: [PRIVATE_KEY],
             chainId: 11822,
