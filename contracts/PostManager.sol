@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import './UserManager.sol'; // Assuming UserManager is in the same directory
+import "./UserManager.sol"; // Assuming UserManager is in the same directory
 
 contract PostManager {
     struct Post {
@@ -19,21 +19,28 @@ contract PostManager {
 
     UserManager private userManager;
 
-    event PostCreated(uint256 indexed postId, address indexed author, string content, uint256 timestamp);
-    event PostUpdated(uint256 indexed postId, string content, uint256 timestamp);
+    event PostCreated(
+        uint256 indexed postId,
+        address indexed author,
+        string content,
+        uint256 timestamp
+    );
+    event PostUpdated(
+        uint256 indexed postId,
+        string content,
+        uint256 timestamp
+    );
     event PostLiked(uint256 indexed postId, address indexed liker);
 
-   
+    event PostDeleted(uint256 indexed postId);
 
-// modifier onlyExistingUser(address _userAddress) {
-//     // Retrieve the user profile
-//     (string memory name, , , ) = userManager.getUserProfile(_userAddress);
-//     // Check if the name field is not empty
-//     require(bytes(name).length > 0, "User does not exist.");
-//     _;
-// }
-
-  
+    // modifier onlyExistingUser(address _userAddress) {
+    //     // Retrieve the user profile
+    //     (string memory name, , , ) = userManager.getUserProfile(_userAddress);
+    //     // Check if the name field is not empty
+    //     require(bytes(name).length > 0, "User does not exist.");
+    //     _;
+    // }
 
     constructor(address _userManagerAddress) {
         userManager = UserManager(_userManagerAddress);
@@ -77,14 +84,35 @@ contract PostManager {
         emit PostLiked(_postId, msg.sender);
     }
 
-    function getPost(uint256 _postId) public view returns (address, string memory, uint256, uint256) {
+    function getPost(
+        uint256 _postId
+    ) public view returns (address, string memory, uint256, uint256) {
         require(posts[_postId].exists, "Post does not exist.");
 
         Post memory post = posts[_postId];
         return (post.author, post.content, post.timestamp, post.likes);
     }
 
-    function getUserPosts(address _userAddress) public view returns (uint256[] memory) {
+    function getUserPosts(
+        address _userAddress
+    ) public view returns (uint256[] memory) {
         return userPosts[_userAddress];
+    }
+
+    function getUserPostsCount(
+        address _userAddress
+    ) public view returns (uint256) {
+        return userPosts[_userAddress].length;
+    }
+
+    //delete post
+    function deletePost(uint256 _postId) public {
+        require(posts[_postId].exists, "Post does not exist.");
+        require(
+            posts[_postId].author == msg.sender,
+            "Only the author can delete the post."
+        );
+        delete posts[_postId];
+        emit PostDeleted(_postId);
     }
 }

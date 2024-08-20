@@ -47,6 +47,8 @@ async function main() {
     const text1 = getRandomText();
     const text2 = getRandomText();
     const text3 = getRandomText();
+    const text4 = getRandomText();
+    const text5 = getRandomText();
     const profilePic1 = getRandomText();
     const profilePic2 = getRandomText();
     const profilePic3 = getRandomText();
@@ -176,10 +178,11 @@ async function main() {
         userManager: any,
         name: any,
         bio: any,
+        age: any,
         profilePic: any
     ) {
         console.log(`Adding user: ${name}`);
-        await userManager.registerUser(name, bio, profilePic);
+        await userManager.registerUser(name, bio, age, profilePic);
     }
 
     // Updating user profile
@@ -187,10 +190,11 @@ async function main() {
         userManager: any,
         name: any,
         bio: any,
+        age: any,
         profilePic: any
     ) {
         console.log(`Updating user profile for address: ${name}`);
-        await userManager.updateUserProfile(name, bio, profilePic);
+        await userManager.updateUserProfile(name, bio, age, profilePic);
     }
 
     // Retrieving user profile
@@ -213,14 +217,26 @@ async function main() {
         : "0x713b8F6E2e42C0481E8B2A4095A4f878BF932716"; // Replace with actual address of Bob
 
     // Adding users
-    await addUser(userManager, name1, bio1, profilePic1);
+    await addUser(
+        userManager,
+        name1,
+        bio1,
+        getRandomWeightedNumber() / 100,
+        profilePic1
+    );
     await waitForRandomTime();
 
     //await addUser(userManager, "Jaimi", "I write", "Pic link");
     await waitForRandomTime();
 
     // Updating user profiles
-    await updateUserProfile(userManager, name1, bio2, profilePic2);
+    await updateUserProfile(
+        userManager,
+        name1,
+        bio2,
+        getRandomWeightedNumber() / 100,
+        profilePic2
+    );
     await waitForRandomTime();
 
     // Retrieving user profiles
@@ -319,6 +335,12 @@ async function main() {
         console.log(`Post ID ${postId}:`, post);
     }
 
+    async function getUserPostsCount(postManager: any, userAddress: any) {
+        console.log(`Retrieving post count for user: ${userAddress}`);
+        const count = await postManager.getUserPostsCount(userAddress);
+        console.log(`Post count for ${userAddress}:`, count);
+    }
+
     // Deleting a post
     async function deletePost(postManager: any, postId: any) {
         console.log(`Deleting post ID: ${postId}`);
@@ -333,13 +355,27 @@ async function main() {
 
     await waitForRandomTime();
 
+    await createPost(postManager, text3);
+    await waitForRandomTime();
+
+    await createPost(postManager, text4);
+    await waitForRandomTime();
+
+    await createPost(postManager, text5);
+    await waitForRandomTime();
+
     // Assuming post IDs are 1 and 2 for the created posts
     const postId1 = 1;
     const postId2 = 2;
+    const postId3 = 3;
+    const postId4 = 4;
+    const postId5 = 5;
 
     // Retrieving posts
     await getPost(postManager, postId1);
     await getPost(postManager, postId2);
+
+    getUserPostsCount(postManager, deployer.address);
     await waitForRandomTime();
 
     // Updating a post
@@ -347,6 +383,9 @@ async function main() {
 
     // Retrieving updated post
     await getPost(postManager, postId1);
+    await waitForRandomTime();
+
+    //await deletePost(postManager, postId3);
 
     //! 3 Follow system Ends
 
@@ -674,7 +713,7 @@ async function main() {
     const reportId1 = 1;
 
     // Reviewing reports
-    await reviewPostReport(contentModeration, reportId1, reviewDecision);
+    //await reviewPostReport(contentModeration, reportId1, reviewDecision);
 
     //await reviewCommentReport(contentModeration, reportId1, reviewDecision);
 
@@ -745,23 +784,6 @@ async function main() {
 
     //! 9 Group system ends
     console.log("All interactions completed successfully.");
-
-    if (VERIFY_CONTRACTS) {
-        // Verify the contract on Etherscan
-        for (const contractAddress of contractAddressArray) {
-            exec(
-                `npx hardhat verify --network bartio_testnet ${contractAddress}`,
-                (error: any, stdout: any, stderr: any) => {
-                    if (error) {
-                        console.error(`exec error: ${error}`);
-                        return;
-                    }
-                    console.log(`stdout: ${stdout}`);
-                    console.error(`stderr: ${stderr}`);
-                }
-            );
-        }
-    }
 }
 
 main()

@@ -1,10 +1,10 @@
 
-export const UserManager = "0xC30dF5E0Fe26053a197B8B2A40ADA94c7E2386d0";
-export const SocialToken = "0x529454293F6Ae5fa73b94D2e5aF8c510979fC9AC";
-export const PostManager = "0x3CcceFfDcE3c0e1DF0d9656E69E207942D735652";
-export const CommentManager = "0xa790369DcbFFf68D9F7D61F8A736D728C6fd8d2c";
-export const FollowSystem = "0xb503a3e6184Aa0cEe13E12C8794105A7681caD86";
-export const MessagingSystem = "0x848663eFEfc47040C3d9db1f8846aF4C5aDc6C2F";
-export const RewardsSystem = "0x7EC51bbc02fDF8144691987D0622Ad6515078583";
-export const ContentModeration = "0x05cd191Ac4A265B65a19587e8Dd5111948b2fb18";
-export const GroupManager = "0x4FDcE47113c97DBd03fF384dc7007b284E6C0D44";
+export const UserManager = "0x70850f060B6aa79a38936E1F1889f0c735613FbD";
+export const SocialToken = "0x3626AB1AfF67D9a1c35D609bDe7d134731F792DA";
+export const PostManager = "0x798b1f3200e3ba15BC4356CdDc80349A45190f1D";
+export const CommentManager = "0x419b465D77A9da114DdfE0fcb7ade41865bC0C06";
+export const FollowSystem = "0xdD023d0CC2F89b1D2e42041D0df5E86f64CaB467";
+export const MessagingSystem = "0x99d31387e56BC9d582Dbff079A0A42F2Bd210044";
+export const RewardsSystem = "0x0Ab3c89C863E894D30b759A2a8d3A66d28265Fe4";
+export const ContentModeration = "0x0B29ee4a0C06671A5041034bA76AbA06C89bfDbd";
+export const GroupManager = "0xbccb85801C3b38D4BfE24318278eF9A61b178F80";
