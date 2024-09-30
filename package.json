@@ -12,7 +12,7 @@
     "devDependencies": {
         "@nomicfoundation/hardhat-toolbox": "^5.0.0",
         "@nomicfoundation/hardhat-verify": "^2.0.9",
-        "hardhat": "^2.22.2"
+        "hardhat": "^2.22.9"
     },
     "dependencies": {
         "@openzeppelin/contracts": "^4.6.0",

@@ -43,6 +43,23 @@ const config: HardhatUserConfig = {
             chainId: 9789,
         },
 
+        sonicTestnet: {
+            url: "https://rpc.testnet.soniclabs.com",
+            accounts: [PRIVATE_KEY],
+            chainId: 64165,
+        },
+        tabiTestnet2: {
+            url: "https://rpc.testnetv2.tabichain.com",
+            accounts: [PRIVATE_KEY],
+            chainId: 9788,
+        },
+
+        minatoTestnet: {
+            url: "https://rpc.minato.soneium.org/",
+            accounts: [PRIVATE_KEY],
+            chainId: 1946,
+        },
+
         tenTestnet: {
             url: "https://testnet.ten.xyz/v1/?token=474DCD7D16298E42C788F6F2CE0BD633888538EF",
             accounts: [PRIVATE_KEY],
@@ -55,9 +72,9 @@ const config: HardhatUserConfig = {
         }, //done
 
         lineaSepolia: {
-            url: "https://rpc.linea.io",
+            url: "https://linea-sepolia.infura.io/v3/24NvPKnk43M4PcAuOPParAN3AFB",
             accounts: [PRIVATE_KEY],
-            chainId: 250,
+            chainId: 59141,
         },
         bartio_testnet: {
             url: "https://bartio.rpc.berachain.com/",

@@ -129,6 +129,10 @@ async function main() {
     const postManager = await deployOrFetch("PostManager", [
         userManager.target,
     ]);
+    const likeShare = await deployOrFetch("LikeShare", [
+        userManager.target,
+        postManager.target,
+    ]);
     const commentManager = await deployOrFetch("CommentManager", [
         userManager.target,
         postManager.target,
@@ -152,6 +156,8 @@ async function main() {
         deployer.address,
     ]);
 
+    const myNFT = await deployOrFetch("MyNFT", []);
+
     // Write updated contracts to contracts.ts
     if (NEW_DEPLOY) {
         fs.writeFileSync(contractsFilePath, updatedContractsFile, "utf8");
@@ -167,10 +173,11 @@ async function main() {
         rewardsSystem.target,
         contentModeration.target,
         groupManager.target,
+        likeShare.target,
     ];
 
     //**Interaction Starts */ */
-    //! 1 Follow system starts
+    //! 1 User manager starts
     // Interactions with UserManager Contract
 
     // Adding users
@@ -244,7 +251,7 @@ async function main() {
     const alice = await getUserByUsername(userManager, name1);
     console.log("Alice profile", alice);
 
-    //! 1 Follow system Ends
+    //! 1 User Manager Ends
 
     //! 2 Follow system starts
     // Interactions with SocialToken Contract
@@ -783,6 +790,90 @@ async function main() {
     await getUserGroups(groupManager, deployer);
 
     //! 9 Group system ends
+
+    //! LikeShare system starts
+    // Interactions with LikeShare Contract
+    //**Interaction Starts */ */
+    //! LikeAndShare Contract Interactions
+
+    // Liking a post
+    async function likePost(likeShare: any, postId: any) {
+        console.log(`Liking post with ID: ${postId}`);
+        await likeShare.likePost(postId);
+    }
+
+    // Unliking a post
+    async function unlikePost(likeShare: any, postId: any) {
+        console.log(`Unliking post with ID: ${postId}`);
+        await likeShare.unlikePost(postId);
+    }
+
+    // Sharing a post
+    async function sharePost(likeShare: any, postId: any) {
+        console.log(`Sharing post with ID: ${postId}`);
+        await likeShare.sharePost(postId);
+    }
+
+    // Retrieving post likes
+    async function getPostLikes(likeShare: any, postId: any) {
+        console.log(`Retrieving likes for post with ID: ${postId}`);
+        const likes = await likeShare.getPostLikes(postId);
+        console.log(`Post ID ${postId} has ${likes} likes`);
+    }
+
+    // Retrieving post shares
+    async function getPostShares(likeShare: any, postId: any) {
+        console.log(`Retrieving shares for post with ID: ${postId}`);
+        const shares = await likeShare.getPostShares(postId);
+        console.log(`Post ID ${postId} has ${shares} shares`);
+    }
+
+    // Liking posts
+    await likePost(likeShare, postId1);
+    await waitForRandomTime();
+
+    // Unliking posts
+    await unlikePost(likeShare, postId1);
+    await waitForRandomTime();
+
+    // Sharing posts
+    await sharePost(likeShare, postId2);
+    await waitForRandomTime();
+
+    // Retrieving post likes and shares
+    await getPostLikes(likeShare, postId1);
+    await getPostShares(likeShare, postId2);
+
+    //! 10 LikeShare system ends
+    //! 11 MyNFT system starts
+
+    // Interacting with MyNFT contract
+
+    // Minting an NFT
+    async function mintNFT(myNFT: any, tokenURI: string) {
+        console.log(`Minting NFT with URI: ${tokenURI}`);
+        const txn = await myNFT.createNFT(tokenURI);
+        await txn.wait();
+        console.log("NFT minted:", tokenURI);
+    }
+
+    // Retrieve NFT details
+    async function getNFTDetails(myNFT: any, tokenId: number) {
+        const owner = await myNFT.ownerOf(tokenId);
+        const tokenURI = await myNFT.tokenURI(tokenId);
+        console.log(
+            `Token ID ${tokenId} is owned by ${owner} with URI: ${tokenURI}`
+        );
+    }
+
+    // Example usage
+    const tokenURI = "https://ipfs.io/ipfs/Qm...";
+    await mintNFT(myNFT, tokenURI);
+    await getNFTDetails(myNFT, 0); // Replace with actual token ID
+    //! 11 MyNFT system ends
+
+    //**Interaction Ends */ */
+
     console.log("All interactions completed successfully.");
 }
 
