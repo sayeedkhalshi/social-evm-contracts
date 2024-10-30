@@ -54,6 +54,12 @@ const config: HardhatUserConfig = {
             chainId: 9788,
         },
 
+        moveTestnet: {
+            url: "https://mevm.devnet.imola.movementlabs.xyz",
+            accounts: [PRIVATE_KEY],
+            chainId: 30732,
+        },
+
         minatoTestnet: {
             url: "https://rpc.minato.soneium.org/",
             accounts: [PRIVATE_KEY],
@@ -94,9 +100,9 @@ const config: HardhatUserConfig = {
         // },
 
         shardeumTestnet: {
-            url: "https://rpc.testnet.shardeum.network",
+            url: "https://atomium.shardeum.org/",
             accounts: [PRIVATE_KEY],
-            chainId: 10004,
+            chainId: 8082,
         },
 
         haven1Testnet: {
@@ -153,10 +159,16 @@ const config: HardhatUserConfig = {
             accounts: [PRIVATE_KEY],
             chainId: 11822,
         },
-        citreaTestnet: {
+        citreaDevnet: {
             url: "https://rpc.devnet.citrea.xyz",
             accounts: [PRIVATE_KEY],
             chainId: 62298,
+        },
+
+        citreaTestnet: {
+            url: "https://rpc.testnet.citrea.xyz",
+            accounts: [PRIVATE_KEY],
+            chainId: 5115,
         },
     },
 };

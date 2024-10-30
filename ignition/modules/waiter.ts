@@ -8,16 +8,16 @@ export function getRandomWeightedNumber(): number {
 
     if (rand < 0.8) {
         // 80% of the time: Return between 3 and 8
-        min = 5;
-        max = 8;
+        min = 50;
+        max = 80;
     } else if (rand < 0.9) {
         // 10% of the time: Return between 8 and 12
-        min = 8;
-        max = 12;
+        min = 80;
+        max = 120;
     } else {
         // 10% of the time: Return between 12 and 50
-        min = 12;
-        max = 50;
+        min = 120;
+        max = 500;
     }
 
     // Generate a random number between min and max

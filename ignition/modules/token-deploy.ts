@@ -1,8 +1,8 @@
 import { ethers } from "hardhat";
+import quais from "quais";
 
 async function main() {
     const [deployer] = await ethers.getSigners();
-
     console.log("Deploying contracts with the account:", deployer.address);
 
     const balance = await deployer.provider.getBalance(deployer.address);
