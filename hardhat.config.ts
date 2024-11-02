@@ -104,6 +104,11 @@ const config: HardhatUserConfig = {
             accounts: [PRIVATE_KEY],
             chainId: 8082,
         },
+        chainbaseTestnet: {
+            url: "testnet.s.chainbase.com",
+            accounts: [PRIVATE_KEY],
+            chainId: 2233,
+        },
 
         haven1Testnet: {
             url: "https://testnet-rpc.haven1.org",
