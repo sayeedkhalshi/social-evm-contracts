@@ -43,6 +43,12 @@ const config: HardhatUserConfig = {
             chainId: 9789,
         },
 
+        unichainTestnet: {
+            url: "https://sepolia.unichain.org",
+            accounts: [PRIVATE_KEY],
+            chainId: 1301,
+        },
+
         sonicTestnet: {
             url: "https://rpc.testnet.soniclabs.com",
             accounts: [PRIVATE_KEY],
@@ -105,7 +111,7 @@ const config: HardhatUserConfig = {
             chainId: 8082,
         },
         chainbaseTestnet: {
-            url: "testnet.s.chainbase.com",
+            url: "https://testnet.s.chainbase.com",
             accounts: [PRIVATE_KEY],
             chainId: 2233,
         },
@@ -174,6 +180,11 @@ const config: HardhatUserConfig = {
             url: "https://rpc.testnet.citrea.xyz",
             accounts: [PRIVATE_KEY],
             chainId: 5115,
+        },
+        storyTestnet: {
+            url: "https://testnet.storyrpc.io",
+            accounts: [PRIVATE_KEY],
+            chainId: 1513,
         },
     },
 };
