@@ -65,6 +65,19 @@ async function main() {
     const reportReason2 = getRandomReportReason();
     const groupJanena = getRandomGroupname();
     const groupJanena2 = getRandomGroupname();
+    const city1 = getRandomText();
+    const city2 = getRandomText();
+    const city3 = getRandomText();
+    const city4 = getRandomText();
+    const country1 = getRandomText();
+    const country2 = getRandomText();
+    const country3 = getRandomText();
+    const country4 = getRandomText();
+    const country5 = getRandomText();
+    const profession1 = getRandomText();
+    const profession2 = getRandomText();
+    const profession3 = getRandomText();
+    const profession4 = getRandomText();
 
     const directoryPath = path.join(
         __dirname,
@@ -186,10 +199,21 @@ async function main() {
         name: any,
         bio: any,
         age: any,
-        profilePic: any
+        profilePic: any,
+        city: any,
+        country: any,
+        profession: any
     ) {
         console.log(`Adding user: ${name}`);
-        await userManager.registerUser(name, bio, age, profilePic);
+        await userManager.registerUser(
+            name,
+            bio,
+            age,
+            profilePic,
+            city,
+            country,
+            profession
+        );
     }
 
     // Updating user profile
@@ -198,10 +222,21 @@ async function main() {
         name: any,
         bio: any,
         age: any,
-        profilePic: any
+        profilePic: any,
+        city: any,
+        country: any,
+        profession: any
     ) {
         console.log(`Updating user profile for address: ${name}`);
-        await userManager.updateUserProfile(name, bio, age, profilePic);
+        await userManager.updateUserProfile(
+            name,
+            bio,
+            age,
+            profilePic,
+            city,
+            country,
+            profession
+        );
     }
 
     // Retrieving user profile
@@ -229,7 +264,10 @@ async function main() {
         name1,
         bio1,
         getRandomWeightedNumber() / 100,
-        profilePic1
+        profilePic1,
+        city1,
+        country1,
+        profession1
     );
     await waitForRandomTime();
 
@@ -242,7 +280,10 @@ async function main() {
         name1,
         bio2,
         getRandomWeightedNumber() / 100,
-        profilePic2
+        profilePic2,
+        city2,
+        country2,
+        profession2
     );
     await waitForRandomTime();
 

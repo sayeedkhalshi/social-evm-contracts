@@ -181,10 +181,15 @@ const config: HardhatUserConfig = {
             accounts: [PRIVATE_KEY],
             chainId: 5115,
         },
-        storyTestnet: {
+        storyIlliadTestnet: {
             url: "https://testnet.storyrpc.io",
             accounts: [PRIVATE_KEY],
             chainId: 1513,
+        },
+        storyOdysseyTestnet: {
+            url: "https://rpc.odyssey.storyrpc.io/",
+            accounts: [PRIVATE_KEY],
+            chainId: 1516,
         },
     },
 };

@@ -9,6 +9,9 @@ contract UserManager {
         string bio;
         string profilePic;
         uint256 joinDate;
+        string country;
+        string city;
+        string profession;
     }
 
     mapping(address => User) private users;
@@ -21,7 +24,10 @@ contract UserManager {
             age: 29,
             bio: "I am starter",
             profilePic: "zkscam.com/images/logo.png",
-            joinDate: block.timestamp
+            joinDate: block.timestamp,
+            country: "USA",
+            city: "New York",
+            profession: "Software Engineer"
         });
 
         users[0x89De2C53352850d8c1f18E7D3d1Ba999cEB2E1f5] = newUser;
@@ -33,13 +39,19 @@ contract UserManager {
     event UserRegistered(
         address indexed userAddress,
         string username,
-        uint256 joinDate
+        uint256 joinDate,
+        string country,
+        string city,
+        string profession
     );
     event UserProfileUpdated(
         address indexed userAddress,
         string username,
         string bio,
-        string profilePic
+        string profilePic,
+        string country,
+        string city,
+        string profession
     );
 
     modifier onlyExistingUser(address _userAddress) {
@@ -62,7 +74,10 @@ contract UserManager {
         string memory _username,
         string memory _bio,
         uint256 _age,
-        string memory _profilePic
+        string memory _profilePic,
+        string memory _country,
+        string memory _city,
+        string memory _profession
     ) public onlyUniqueUsername(_username) {
         require(bytes(_username).length > 0, "Username cannot be empty.");
         require(bytes(_bio).length > 0, "Bio cannot be empty.");
@@ -73,20 +88,33 @@ contract UserManager {
             bio: _bio,
             age: _age,
             profilePic: _profilePic,
+            country: _country,
+            city: _city,
+            profession: _profession,
             joinDate: block.timestamp
         });
 
         users[msg.sender] = newUser;
         usernameToAddress[_username] = msg.sender;
 
-        emit UserRegistered(msg.sender, _username, block.timestamp);
+        emit UserRegistered(
+            msg.sender,
+            _username,
+            block.timestamp,
+            _country,
+            _city,
+            _profession
+        );
     }
 
     function updateUserProfile(
         string memory _username,
         string memory _bio,
         uint256 _age,
-        string memory _profilePic
+        string memory _profilePic,
+        string memory _country,
+        string memory _city,
+        string memory _profession
     ) public onlyExistingUser(msg.sender) {
         require(bytes(_username).length > 0, "Username cannot be empty.");
         require(bytes(_bio).length > 0, "Bio cannot be empty.");
@@ -96,8 +124,19 @@ contract UserManager {
         user.bio = _bio;
         user.age = _age;
         user.profilePic = _profilePic;
+        user.country = _country;
+        user.city = _city;
+        user.profession = _profession;
 
-        emit UserProfileUpdated(msg.sender, _username, _bio, _profilePic);
+        emit UserProfileUpdated(
+            msg.sender,
+            _username,
+            _bio,
+            _profilePic,
+            user.country,
+            user.city,
+            user.profession
+        );
     }
 
     function getUserProfile(
@@ -106,7 +145,16 @@ contract UserManager {
         public
         view
         onlyExistingUser(_userAddress)
-        returns (string memory, uint256, string memory, string memory, uint256)
+        returns (
+            string memory,
+            uint256,
+            string memory,
+            string memory,
+            uint256,
+            string memory,
+            string memory,
+            string memory
+        )
     {
         User memory user = users[_userAddress];
         return (
@@ -114,7 +162,10 @@ contract UserManager {
             user.age,
             user.bio,
             user.profilePic,
-            user.joinDate
+            user.joinDate,
+            user.country,
+            user.city,
+            user.profession
         );
     }
 
@@ -122,5 +173,12 @@ contract UserManager {
         string memory _username
     ) public view returns (address) {
         return usernameToAddress[_username];
+    }
+
+    function getUserByAddress(
+        address _userAddress
+    ) public view returns (string memory, string memory, string memory) {
+        User memory user = users[_userAddress];
+        return (user.username, user.country, user.city);
     }
 }

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import './UserManager.sol'; // Assuming UserManager is in the same directory
-import './PostManager.sol'; // Assuming PostManager is in the same directory
+import "./UserManager.sol"; // Assuming UserManager is in the same directory
+import "./PostManager.sol"; // Assuming PostManager is in the same directory
 
 contract CommentManager {
     struct Comment {
@@ -14,15 +14,34 @@ contract CommentManager {
         bool exists;
     }
 
+    struct Reply {
+        uint256 commentId;
+        uint256 parentCommentId;
+        address replyer;
+        string content;
+        uint256 timestamp;
+    }
+
     mapping(uint256 => Comment) private comments;
     mapping(uint256 => uint256[]) private postComments;
+    mapping(uint256 => Reply[]) private commentReplies;
     uint256 private nextCommentId;
 
     UserManager private userManager;
     PostManager private postManager;
 
-    event CommentCreated(uint256 indexed commentId, uint256 indexed postId, address indexed commenter, string content, uint256 timestamp);
-    event CommentUpdated(uint256 indexed commentId, string content, uint256 timestamp);
+    event CommentCreated(
+        uint256 indexed commentId,
+        uint256 indexed postId,
+        address indexed commenter,
+        string content,
+        uint256 timestamp
+    );
+    event CommentUpdated(
+        uint256 indexed commentId,
+        string content,
+        uint256 timestamp
+    );
     event CommentDeleted(uint256 indexed commentId);
 
     constructor(address _userManagerAddress, address _postManagerAddress) {
@@ -45,8 +64,37 @@ contract CommentManager {
 
         postComments[_postId].push(nextCommentId);
 
-        emit CommentCreated(nextCommentId, _postId, msg.sender, _content, block.timestamp);
+        emit CommentCreated(
+            nextCommentId,
+            _postId,
+            msg.sender,
+            _content,
+            block.timestamp
+        );
 
+        nextCommentId++;
+    }
+
+    function createReply(uint256 _commentId, string memory _content) public {
+        require(bytes(_content).length > 0, "Reply content cannot be empty.");
+        require(comments[_commentId].exists, "Comment does not exist.");
+
+        Reply memory newReply = Reply({
+            commentId: _commentId,
+            parentCommentId: _commentId,
+            replyer: msg.sender,
+            content: _content,
+            timestamp: block.timestamp
+        });
+
+        commentReplies[_commentId].push(newReply);
+        emit CommentCreated(
+            nextCommentId,
+            _commentId,
+            msg.sender,
+            _content,
+            block.timestamp
+        );
         nextCommentId++;
     }
 
@@ -55,7 +103,10 @@ contract CommentManager {
 
         Comment storage comment = comments[_commentId];
         require(comment.exists, "Comment does not exist.");
-        require(comment.commenter == msg.sender, "Only the commenter can update the comment.");
+        require(
+            comment.commenter == msg.sender,
+            "Only the commenter can update the comment."
+        );
 
         comment.content = _content;
         comment.timestamp = block.timestamp;
@@ -66,7 +117,10 @@ contract CommentManager {
     function deleteComment(uint256 _commentId) public {
         Comment storage comment = comments[_commentId];
         require(comment.exists, "Comment does not exist.");
-        require(comment.commenter == msg.sender, "Only the commenter can delete the comment.");
+        require(
+            comment.commenter == msg.sender,
+            "Only the commenter can delete the comment."
+        );
 
         uint256 postId = comment.postId;
 
@@ -87,14 +141,23 @@ contract CommentManager {
         emit CommentDeleted(_commentId);
     }
 
-    function getComment(uint256 _commentId) public view returns (uint256, address, string memory, uint256) {
+    function getComment(
+        uint256 _commentId
+    ) public view returns (uint256, address, string memory, uint256) {
         require(comments[_commentId].exists, "Comment does not exist.");
 
         Comment memory comment = comments[_commentId];
-        return (comment.postId, comment.commenter, comment.content, comment.timestamp);
+        return (
+            comment.postId,
+            comment.commenter,
+            comment.content,
+            comment.timestamp
+        );
     }
 
-    function getCommentsByPost(uint256 _postId) public view returns (uint256[] memory) {
+    function getCommentsByPost(
+        uint256 _postId
+    ) public view returns (uint256[] memory) {
         return postComments[_postId];
     }
 }
