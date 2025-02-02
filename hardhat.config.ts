@@ -191,6 +191,31 @@ const config: HardhatUserConfig = {
             accounts: [PRIVATE_KEY],
             chainId: 1516,
         },
+        sonicBlazeTestnet: {
+            url: "https://rpc.blaze.soniclabs.com",
+            accounts: [PRIVATE_KEY],
+            chainId: 57054,
+        },
+        inkTestnet: {
+            url: "https://rpc-gel-sepolia.inkonchain.com",
+            accounts: [PRIVATE_KEY],
+            chainId: 763373,
+        },
+        somniaDevnet: {
+            url: "https://dream-rpc.somnia.network",
+            accounts: [PRIVATE_KEY],
+            chainId: 50311,
+        },
+        saharaTestnet: {
+            url: "https://testnet.saharalabs.ai",
+            accounts: [PRIVATE_KEY],
+            chainId: 313313,
+        },
+        zenchainTestnet: {
+            url: "https://zenchain-testnet.api.onfinality.io/public",
+            accounts: [PRIVATE_KEY],
+            chainId: 8408,
+        },
     },
 };
 

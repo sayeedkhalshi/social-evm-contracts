@@ -37,6 +37,8 @@ async function main() {
     const chainId = (await deployer.provider.getNetwork()).chainId;
     console.log("Chain ID:", chainId);
 
+    console.log("Nonce,", await deployer.getNonce());
+
     //get random data
     const name1 = getRandomUsername();
     const name2 = getRandomUsername();
