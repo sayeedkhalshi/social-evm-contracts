@@ -216,6 +216,16 @@ const config: HardhatUserConfig = {
             accounts: [PRIVATE_KEY],
             chainId: 8408,
         },
+        monadTestnet: {
+            url: "https://testnet-rpc.monad.xyz/",
+            accounts: [PRIVATE_KEY],
+            chainId: 10143,
+        },
+        nexusTestnet: {
+            url: "https://rpc.nexus.xyz/http",
+            accounts: [PRIVATE_KEY],
+            chainId: 392,
+        },
     },
 };
 

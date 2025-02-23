@@ -80,6 +80,10 @@ async function main() {
     const profession2 = getRandomText();
     const profession3 = getRandomText();
     const profession4 = getRandomText();
+    const twitter1 = getRandomText().split(" ")[0];
+    const twitter2 = getRandomText().split(" ")[0];
+    const twitter3 = getRandomText().split(" ")[0];
+    const twitter4 = getRandomText().split(" ")[0];
 
     const directoryPath = path.join(
         __dirname,
@@ -204,7 +208,8 @@ async function main() {
         profilePic: any,
         city: any,
         country: any,
-        profession: any
+        profession: any,
+        twitter: any
     ) {
         console.log(`Adding user: ${name}`);
         await userManager.registerUser(
@@ -214,7 +219,8 @@ async function main() {
             profilePic,
             city,
             country,
-            profession
+            profession,
+            twitter
         );
     }
 
@@ -227,7 +233,8 @@ async function main() {
         profilePic: any,
         city: any,
         country: any,
-        profession: any
+        profession: any,
+        twitter: any
     ) {
         console.log(`Updating user profile for address: ${name}`);
         await userManager.updateUserProfile(
@@ -237,7 +244,8 @@ async function main() {
             profilePic,
             city,
             country,
-            profession
+            profession,
+            twitter
         );
     }
 
@@ -269,7 +277,8 @@ async function main() {
         profilePic1,
         city1,
         country1,
-        profession1
+        profession1,
+        twitter1
     );
     await waitForRandomTime();
 
@@ -285,7 +294,8 @@ async function main() {
         profilePic2,
         city2,
         country2,
-        profession2
+        profession2,
+        twitter2
     );
     await waitForRandomTime();
 
@@ -602,10 +612,22 @@ async function main() {
         console.log(`Message ID: ${messageId}`, message);
     }
 
+    async function updateMessage(
+        messagingSystem: any,
+        messageId: any,
+        newContent: any
+    ) {
+        console.log(
+            `Updating message ID: ${messageId} with content: ${newContent}`
+        );
+        await messagingSystem.updateMessage(messageId, newContent);
+    }
+
     // Example addresses and message content
     const recipientAddress = "0x89De2C53352850d8c1f18E7D3d1Ba999cEB2E1f5"; // Replace with actual recipient address
     const messageContent1 = message1;
     const messageContent2 = message2;
+    const messageContent3 = message3;
     const senderAddress = deployer.address; // Assuming the sender is the deployer
 
     // Sending messages
@@ -621,6 +643,12 @@ async function main() {
     await getMessage(messagingSystem, messageId1);
     // Retrieving sent messages
     await getSentMessages(messagingSystem, senderAddress);
+    await waitForRandomTime();
+
+    //updating message
+    await updateMessage(messagingSystem, messageId1, messageContent3);
+
+    await getMessage(messagingSystem, messageId1);
 
     // Retrieving received messages
     //await getReceivedMessages(messagingSystem, recipientAddress);

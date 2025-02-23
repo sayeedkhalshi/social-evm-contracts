@@ -46,4 +46,9 @@ contract Token is ERC20, Ownable {
     function isApproved(address contractAddress) public view returns (bool) {
         return approvedContracts[contractAddress];
     }
+
+    // get initial supply
+    function getInitialSupply() public pure returns (uint256) {
+        return INITIAL_SUPPLY;
+    }
 }

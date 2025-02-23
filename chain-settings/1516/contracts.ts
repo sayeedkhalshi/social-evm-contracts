@@ -1,12 +1,12 @@
 
-export const UserManager = "0xDcC2B1f970711Cc550523f0C4D3601c92F9C0935";
-export const SocialToken = "0x00939d33090dd1b50781bFB2B4F8632C1417C676";
-export const PostManager = "0xD8be02E68489ea13F367479F570E8bcd888eDD7E";
-export const LikeShare = "0xBB9F93526bFC28c714Fa49b7cEffe5fF3Dd2E21a";
-export const CommentManager = "0x4517238bD18134d71e05E9056C18d8C4EC55EEDa";
-export const FollowSystem = "0xc556520A7a806Af8A3d98B3782b9C43c7F77E82E";
-export const MessagingSystem = "0x2BA78d8A4cF72Ad618F671910f873245403d3067";
-export const RewardsSystem = "0x86832C7aa736BD00157205F8F466BFc4e201Af25";
-export const ContentModeration = "0x21E755BF29c5BeD145BB08399a7576eE76E00315";
-export const GroupManager = "0xbf33C2fAB06b2F08588A3F34f0A247c34e6A70a7";
-export const MyNFT = "0xBab0e31431bF116E48f0a41c718A54b5b8ab8b06";
+export const UserManager = "0x999aecC38f42fCB8907097150bB3E6308Adf4aC7";
+export const SocialToken = "0x5141521338d4e2335e664baD21a97671081Fd73d";
+export const PostManager = "0x039aE7DD5d874Ea2E761B56B11e813559b83f489";
+export const LikeShare = "0x00220294178902825E26954913fACc5e5926723b";
+export const CommentManager = "0x59E5f50E841A76a9E587603C5145BA22D1F0ec52";
+export const FollowSystem = "0xa49d4e701DCFA2c09710e200D170b67eCE49Be1f";
+export const MessagingSystem = "0xb75b5C3B7e19a13BE783d80706cc432F30eE67E0";
+export const RewardsSystem = "0xE5B78f87f0BD1754086197e8D27B2590444757fb";
+export const ContentModeration = "0x9EB54604677546a56Af725D8bDe808ef4724EA2B";
+export const GroupManager = "0xD4e8326E4717D571d303B368f5a99F2141D7e896";
+export const MyNFT = "0x9817437Cc296b680d4Ca60a49E8cfd5b0C2b4f1d";

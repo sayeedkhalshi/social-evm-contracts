@@ -160,4 +160,10 @@ contract CommentManager {
     ) public view returns (uint256[] memory) {
         return postComments[_postId];
     }
+
+    function getRepliesByComment(
+        uint256 _commentId
+    ) public view returns (Reply[] memory) {
+        return commentReplies[_commentId];
+    }
 }

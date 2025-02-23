@@ -12,6 +12,7 @@ contract UserManager {
         string country;
         string city;
         string profession;
+        string twitter;
     }
 
     mapping(address => User) private users;
@@ -27,7 +28,8 @@ contract UserManager {
             joinDate: block.timestamp,
             country: "USA",
             city: "New York",
-            profession: "Software Engineer"
+            profession: "Software Engineer",
+            twitter: "https://twitter.com/alice"
         });
 
         users[0x89De2C53352850d8c1f18E7D3d1Ba999cEB2E1f5] = newUser;
@@ -42,7 +44,8 @@ contract UserManager {
         uint256 joinDate,
         string country,
         string city,
-        string profession
+        string profession,
+        string twitter
     );
     event UserProfileUpdated(
         address indexed userAddress,
@@ -51,7 +54,8 @@ contract UserManager {
         string profilePic,
         string country,
         string city,
-        string profession
+        string profession,
+        string twitter
     );
 
     modifier onlyExistingUser(address _userAddress) {
@@ -77,7 +81,8 @@ contract UserManager {
         string memory _profilePic,
         string memory _country,
         string memory _city,
-        string memory _profession
+        string memory _profession,
+        string memory _twitter
     ) public onlyUniqueUsername(_username) {
         require(bytes(_username).length > 0, "Username cannot be empty.");
         require(bytes(_bio).length > 0, "Bio cannot be empty.");
@@ -91,6 +96,7 @@ contract UserManager {
             country: _country,
             city: _city,
             profession: _profession,
+            twitter: _twitter,
             joinDate: block.timestamp
         });
 
@@ -103,7 +109,8 @@ contract UserManager {
             block.timestamp,
             _country,
             _city,
-            _profession
+            _profession,
+            _twitter
         );
     }
 
@@ -114,7 +121,8 @@ contract UserManager {
         string memory _profilePic,
         string memory _country,
         string memory _city,
-        string memory _profession
+        string memory _profession,
+        string memory _twitter
     ) public onlyExistingUser(msg.sender) {
         require(bytes(_username).length > 0, "Username cannot be empty.");
         require(bytes(_bio).length > 0, "Bio cannot be empty.");
@@ -127,6 +135,7 @@ contract UserManager {
         user.country = _country;
         user.city = _city;
         user.profession = _profession;
+        user.twitter = _twitter;
 
         emit UserProfileUpdated(
             msg.sender,
@@ -135,7 +144,8 @@ contract UserManager {
             _profilePic,
             user.country,
             user.city,
-            user.profession
+            user.profession,
+            user.twitter
         );
     }
 
@@ -153,6 +163,7 @@ contract UserManager {
             uint256,
             string memory,
             string memory,
+            string memory,
             string memory
         )
     {
@@ -165,7 +176,8 @@ contract UserManager {
             user.joinDate,
             user.country,
             user.city,
-            user.profession
+            user.profession,
+            user.twitter
         );
     }
 
@@ -177,8 +189,24 @@ contract UserManager {
 
     function getUserByAddress(
         address _userAddress
-    ) public view returns (string memory, string memory, string memory) {
+    )
+        public
+        view
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
+    {
         User memory user = users[_userAddress];
-        return (user.username, user.country, user.city);
+        return (
+            user.username,
+            user.country,
+            user.city,
+            user.profession,
+            user.twitter
+        );
     }
 }

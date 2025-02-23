@@ -19,4 +19,8 @@ contract MyNFT is ERC721URIStorage, Ownable {
         tokenCounter++;
         return newTokenId;
     }
+
+    function getTokenCounter() public view returns (uint256) {
+        return tokenCounter;
+    }
 }
